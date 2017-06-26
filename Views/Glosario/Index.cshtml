@@ -1,0 +1,94 @@
+@using System.Collections.Generic
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Authentication
+
+@{
+    ViewData["Title"] = "Glosario";    
+    var tipo = @ViewBag.TipoUsuario;
+    if(tipo == 1){
+        Layout = "~/Views/Shared/_LayoutAdministrador.cshtml";
+    }else if(tipo == 2){
+        Layout = "~/Views/Shared/_LayoutTraductor.cshtml";
+    }else{
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+}
+
+<h2>@ViewData["Title"]</h2>
+<div class="row">
+    <div class="col-md-6">
+        <section>            
+            <form action="" method="post" enctype="multipart/form-data">
+                <label for="file1">Subir fichero de glosario:</label>
+                <input type="file" name="file" id="file1" value="Buscar"/>
+                
+                <br><br>                
+                <input type="submit" value="Subir" class="btn btn-primary"/>
+            </form>            
+        </section>
+    </div>  
+    <div class="col-md-6">
+        <p class="bg-info">
+                <h3>Tipos de archivo que puedes subir: .csv</h3>
+                <span>Debe contener en la cabecera los códigos de los lenguajes y en el contenido las palabras origen y destino que deseamos que se traduzcan.</span>   
+                <br>
+                <span><strong>Todos los valores deben estar separados por comas</strong></span>
+                <br><br>
+                <div class="col-md-6">
+                    <img src="~/images/ejemploGlosario.png">     
+                </div> 
+                <div class="col-md-6">          
+                    <table class="table table-condensed">
+                        <tr>
+                            <th>Lenguaje</th>
+                            <th>Código</th>
+                        </tr>
+                        <tr>
+                            <td>Español</td>
+                            <td>es</td>
+                        </tr>
+                        <tr>
+                            <td>Inglés</td>
+                            <td>en</td>
+                        </tr>
+                        <tr>
+                            <td>Francés</td>
+                            <td>fr</td>
+                        </tr>
+                        <tr>
+                            <td>Italiano</td>
+                            <td>it</td>
+                        </tr>
+                        <tr>
+                            <td>Portugués</td>
+                            <td>pt</td>
+                        </tr>
+                        <tr>
+                            <td>Alemán</td>
+                            <td>de</td>
+                        </tr>
+                        <tr>
+                            <td>Japonés</td>
+                            <td>ja</td>
+                        </tr>
+                        <tr>
+                            <td>Chino</td>
+                            <td>zh</td>
+                        </tr>
+                    </table>   
+                </div>        
+        </p>
+    </div>
+    <br><br>
+            @if(ViewBag.ok==true){
+                <p class="text-success">Glosario subido con éxito</p>
+            }  
+</div>
+@section Scripts {
+    <script>
+    $(document).ready(function(){           
+        $(".nav").find(".active").removeClass("active");
+        $("#tabGlosario").addClass("active");         
+    });
+    </script>
+}

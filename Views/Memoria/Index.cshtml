@@ -1,0 +1,85 @@
+@using System.Collections.Generic
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Authentication
+
+@{
+    ViewData["Title"] = "Subida de memorias de traducción";    
+    var tipo = @ViewBag.TipoUsuario;
+    if(tipo == 1){
+        Layout = "~/Views/Shared/_LayoutAdministrador.cshtml";
+    }else if(tipo == 2){
+        Layout = "~/Views/Shared/_LayoutTraductor.cshtml";
+    }else{
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+}
+<h2>@ViewData["Title"]</h2>
+<div class="row">
+    <div class="col-md-6">        
+        <section>            
+            <form action="" method="post" enctype="multipart/form-data">
+                
+                <label for="file1">Lengua origen:</label>
+                <div>
+                    <select name ="lang1">
+                        <option value="es">Español</option>
+                        <option value="en">Ingl&eacute;s</option>
+                        <option value="fr">Franc&eacute;s</option>
+                        <option value="it">Italiano</option>
+                        <option value="pt">Portugu&eacute;s</option>
+                        <option value="de">Alem&aacute;n</option>
+                        <option value="ja">Japon&eacute;s</option>
+                        <option value="zh">Chino</option>
+                    </select>
+                </div>
+                <br/>
+                <div>
+                    <input type="file" name="files" id="file1" value="Buscar" style="max-width: 400px;"/>
+                </div>
+                <br><br>
+                
+                <label for="file2">Lengua destino:</label>
+                <div>
+                    <select name="lang2">                        
+                        <option value="en">Ingl&eacute;s</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Franc&eacute;s</option>
+                        <option value="it">Italiano</option>
+                        <option value="pt">Portugu&eacute;s</option>
+                        <option value="de">Alem&aacute;n</option>
+                        <option value="ja">Japon&eacute;s</option>
+                        <option value="zh">Chino</option>
+                    </select>
+                </div>
+                 <br/>
+                <input type="file" name="files" id="file2" value="Buscar" style="max-width: 400px;"/>
+                
+                <br><br>
+                <input type="submit" value="Subir" class="btn btn-primary"/>
+            </form>
+            <br><br>
+            @if(ViewBag.ok==true){
+                <p class="text-success">Memoria subida correctamente</p>
+            }            
+        </section>     
+    </div>
+    <div class="col-md-6">
+        <p class="bg-info">
+                <h3>Tipos de archivo que puedes subir: documentos de texto sin formato (.txt)</h3>
+                <br>
+                <span><strong>Los dos documentos deben estar alineados por frase.</strong></span>
+                                      
+                        
+        </p>
+    </div>   
+</div> 
+
+@section Scripts {
+    <script>
+    $(document).ready(function(){           
+        $(".nav").find(".active").removeClass("active");
+        $("#tabMemoria").addClass("active");         
+    });
+    </script>
+}
+

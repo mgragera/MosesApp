@@ -1,0 +1,305 @@
+@using System.Collections.Generic
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Authentication
+@model Moses.Models.ViewModels
+
+@{
+    ViewData["Title"] = "Traductor";
+    var tipo = @ViewBag.TipoUsuario;
+    if(tipo == 1){
+        Layout = "~/Views/Shared/_LayoutAdministrador.cshtml";
+    }else if(tipo == 2){
+        Layout = "~/Views/Shared/_LayoutTraductor.cshtml";
+    }else{
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+}
+
+<br>
+<div>
+    <div>
+        <section>            
+            <form id="traduccionForm" action="" method="post" enctype="multipart/form-data">
+                @if(@Model != null){
+                    <div id="selectorProyectos" class=".col-md-4">
+                        <label for="proyectos"> Seleccione un proyecto:</label>                        
+                        <select id="slctProyectos" class="form-control" name="proyecto">
+                            <option value="--">--</option>
+                            @foreach (var proyecto in @Model.Proyectos){
+                                <option value=@proyecto.Descripcion.ToString()>@Html.DisplayFor(modelItem  => proyecto.Descripcion)</option>
+                            }
+                        </select>
+                    </div>                
+                    <br><br>
+                }
+                <label for="file1">Lengua origen:</label>               
+                <select id ="langOrigen" class="l1" name ="lang1">                    
+                </select>
+                @if(@ViewBag.textOriginal==null){
+                    <textarea class="form-control" rows="5"name="text1" style="max-width: 100%; color:grey;">Introducir texto</textarea>
+                }else{
+                    <textarea class="form-control" rows="5"name="text1" style="max-width: 100%;">@ViewBag.textOriginal</textarea>
+                }
+                <br>
+                <span style="color:red">@ViewBag.errorTraduccion</span>  
+                <br>
+                <label for="file2">Lengua destino:</label>                
+                <select id ="langDestino" class="l2" name="lang2"> 
+                </select>
+                @if(@ViewBag.traduccion==null){
+                    <textarea readonly class="form-control" rows="5"name="text1" style="max-width: 100%; color:grey">Texto traducido</textarea>
+                }else{
+                    <textarea readonly class="form-control" rows="5"name="text1" style="max-width: 100%;">@ViewBag.traduccion</textarea>
+                }
+                
+                <br>
+                <div class="col-md-6">
+                    @if(@Model == null){
+                    <input type="checkbox" name="chkGlosario" value="true">
+                    <label for="chkGlosario"> Usar glosario</label>
+                    <br><br>}
+                    <input type="submit" value="Traducir"/>
+                    
+                </div>
+                <div class="col-md-6">
+                    @if(@ViewBag.palabrasReemplazadas !=null){
+                        
+                            <span style="font-weight: bold">Glosario</span>
+                            <table class="table table-striped">
+                                    <tr>
+                                        <th>Palabra encontrada</th>
+                                        <th>Palabra traducida</th>
+                                        
+                                    </tr>
+                                    <tbody>
+                                        
+                                    @foreach (var palabra in @ViewBag.palabrasReemplazadas){                
+                                        <tr class="success">
+                                            <td>@palabra.palabraOrigen</td>
+                                            <td>@palabra.palabraNueva</td>                                         
+                                        </tr>                
+                                    }
+                                    </tbody>
+                                </table>
+                        
+                        }else{
+                            <br><br><br><br><br><br><br>
+                        }
+                    </div>
+                <br>
+                
+            </form>               
+        
+        </section>
+    </div>  
+</div>  
+@section Scripts {
+    <script>
+    $(document).ready(function(){
+        /*$("#traduccionForm").submit(function(){
+            console.log($("#traduccionForm").serialize());
+            $.ajax({
+                url: '@Url.Action("TraducirFormulario", "Traductor")',
+                type: 'POST',
+                data: $("#traduccionForm").serialize(),
+                dataType: 'json',
+                error: function(xhr, status, error){
+                    console.log(error);
+                },
+                success: function(data){ 
+                    console.log("SIII");
+                    console.log(data);
+                }
+            });
+
+            return false;
+        })*/
+
+        var selectedLang1 = '@ViewBag.lang1';
+        var selectedLang2 = '@ViewBag.lang2';
+        var proyectoSeleccionado = '@ViewBag.proyectoSeleccionado';
+
+        if($("#slctProyectos").length == 0){
+            $("#langOrigen").empty();
+            $("#langDestino").empty();
+            $.ajax({
+                url: '@Url.Action("BindLenguajesOrigen", "Traductor")',
+                type: 'GET',
+                data: {idProyecto:null},
+                dataType: 'json',
+                success: function(data){ 
+                    console.log(data);  
+                    console.log(data.d);                   
+                    data.forEach(function(leng){
+                        $("#langOrigen").append($('<option>',{
+                            value: leng.origen.codigo,
+                            text: leng.origen.nombre
+                            }));  
+                         
+                    })
+                    $("#langDestino").append($('<option>',{
+                            value: data[0].destino.codigo,
+                            text: data[0].destino.nombre
+                    }));
+                    if(selectedLang1!=null && selectedLang1!=""){
+                        console.log(selectedLang1);
+                        console.log($("#langOrigen"));
+                        $("#langOrigen").val(selectedLang1);
+                        
+                        $.ajax({
+                            url: '@Url.Action("BindLenguajesDestino", "Traductor")',
+                            type: 'GET',
+                            data: {idProyecto:$("#slctProyectos").val(), codLenguaje:selectedLang1},
+                            dataType: 'json',
+                            success: function(data){
+                                console.log(data);
+                                data.forEach(function(leng){
+                                    $("#langDestino").html($('<option>',{
+                                        value: leng.codigo,
+                                        text: leng.nombre
+                                        }));
+                                })
+                                console.log("lang2");
+                                console.log(selectedLang2);                       
+                                $("#langDestino").val(selectedLang2);
+                            }
+                        });
+                        
+                        
+                    }                                        
+                    
+                }
+            });
+        }else{
+            if(proyectoSeleccionado==null || proyectoSeleccionado ==""){                
+                
+            }else{
+                console.log("ad");
+                console.log(proyectoSeleccionado);
+                $("#slctProyectos").val(proyectoSeleccionado);
+            }
+            
+            $.ajax({
+                url: '@Url.Action("BindLenguajesOrigen", "Traductor")',
+                type: 'GET',
+                data: {idProyecto:proyectoSeleccionado},
+                dataType: 'json',
+                success: function(data){ 
+                    console.log(data);  
+                    console.log(data.d);                   
+                    data.forEach(function(leng){
+                        $("#langOrigen").append($('<option>',{
+                            value: leng.origen.codigo,
+                            text: leng.origen.nombre
+                            }));  
+                         
+                    })
+                    $("#langOrigen").val(selectedLang1); 
+
+                    $.ajax({
+                            url: '@Url.Action("BindLenguajesDestino", "Traductor")',
+                            type: 'GET',
+                            data: {idProyecto:$("#slctProyectos").val(), codLenguaje:selectedLang1},
+                            dataType: 'json',
+                            error: function(xhr, status, error){
+                                console.log(error);
+                            },
+                            success: function(data){
+                                console.log(data);
+                                data.forEach(function(leng){
+                                    $("#langDestino").html($('<option>',{
+                                        value: leng.codigo,
+                                        text: leng.nombre
+                                        }));
+                                })
+                                console.log("lang2");
+                                console.log(selectedLang2);                       
+                                $("#langDestino").val(selectedLang2);
+                            }
+                        });
+                }
+            });
+        }
+
+        $("#slctProyectos").change(function(){
+            $("#langOrigen").empty();
+            $("#langDestino").empty();
+            $.ajax({
+                url: '@Url.Action("BindLenguajesOrigen", "Traductor")',
+                type: 'GET',
+                data: {idProyecto:this.value},
+                dataType: 'json',
+                success: function(data){ 
+                    console.log(data);  
+                    console.log(data.d);                   
+                    data.forEach(function(leng){
+                        $("#langOrigen").append($('<option>',{
+                            value: leng.origen.codigo,
+                            text: leng.origen.nombre
+                            }));  
+                         
+                    })
+                    $("#langDestino").append($('<option>',{
+                            value: data[0].destino.codigo,
+                            text: data[0].destino.nombre
+                    }));                                        
+                    
+                }
+            });
+            //bindlenguajesdestino();
+        })
+        $("#langOrigen").change(function(){
+            console.log($("#slctProyectos").find('option:selected'));
+            $("#langDestino").empty();
+            console.log($("#slctProyectos").value);
+            $.ajax({
+                url: '@Url.Action("BindLenguajesDestino", "Traductor")',
+                type: 'GET',
+                data: {idProyecto:$("#slctProyectos").val(), codLenguaje:this.value},
+                dataType: 'json',
+                success: function(data){
+                    console.log(data);
+                    data.forEach(function(leng){
+                        $("#langDestino").html($('<option>',{
+                            value: leng.codigo,
+                            text: leng.nombre
+                            }));
+                    })                        
+                    
+                }
+            });
+        })
+
+        
+        
+        if(selectedLang1!=null && selectedLang1!=""){
+            console.log(selectedLang1);
+            console.log($("#langOrigen"));
+            $("#langOrigen").val(selectedLang1);
+            $(".l2").val(selectedLang2);
+        }
+    });
+    
+    function bindlenguajesdestino(){
+        console.log($("#langOrigen").val());
+        $("#langDestino").empty();
+            $.ajax({
+                url: '@Url.Action("BindLenguajesDestino", "Traductor")',
+                type: 'GET',
+                data: {idProyecto:$("#slctProyectos").val(), codLenguaje:$("#langOrigen").val()},
+                dataType: 'json',
+                success: function(data){
+                    console.log(data);
+                    data.forEach(function(leng){
+                        $("#langDestino").html($('<option>',{
+                            value: leng.codigo,
+                            text: leng.nombre
+                            }));
+                    })                        
+                    
+                }
+            });
+    }
+    </script>
+}
+

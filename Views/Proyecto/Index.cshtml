@@ -1,0 +1,97 @@
+@using System.Collections.Generic
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Authentication
+@model Moses.Models.ViewModels
+@{
+    ViewData["Title"] = "Proyectos";
+    var tipo = @ViewBag.TipoUsuario;
+    if(tipo == 1){
+        Layout = "~/Views/Shared/_LayoutAdministrador.cshtml";
+    }else if(tipo == 2){
+        Layout = "~/Views/Shared/_LayoutTraductor.cshtml";
+    }else{
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+}
+
+<h2>@ViewData["Title"]</h2>
+<div class="row">
+    <div>
+        <section>
+            <table class="table table-bordered">
+                <tr>
+                    <th>#</th>
+                    <th>Título</th>
+                    <th>Fecha de modificación</th>
+                    <th>Actualizado</th>
+                    <th style="align-content: center;"></th>
+                </tr>
+                <tbody>
+                @foreach (var proyecto in @Model.Proyectos){                
+                    <tr id=@proyecto.Id>
+                        <td>@Html.DisplayFor(modelItem  => proyecto.Id)</td>
+                        <td>@Html.DisplayFor(modelItem  => proyecto.Descripcion)</td>
+                        <td>@Html.DisplayFor(modelItem  => proyecto.Fecha_modificacion)</td>
+                        <td>@Html.DisplayFor(modelItem  => proyecto.Actualizado)</td>     
+                        <td>
+                            <img role="button" src="~/images/traducir.png" title="Traducir" onclick="traductor('@Html.DisplayFor(modelItem  => proyecto.Id)')" style="width: 5%;margin-left: 25px;">
+                            <img role="button" src="~/images/subir_memoria.png" title="Subir memorias" onclick="memorias('@Html.DisplayFor(modelItem  => proyecto.Id)')" style="width: 5%;margin-left: 25px;">
+                            <img role="button" src="~/images/glosario.png" title="Subir glosario" onclick="glosario('@Html.DisplayFor(modelItem  => proyecto.Id)')" style="width: 5%;margin-left: 25px;"> 
+                        </td>                   
+                    </tr>                
+                }
+                </tbody>
+            </table>
+        </section>
+    </div>     
+</div>
+
+@section Scripts {
+    <script>
+        
+    $(document).ready(function(){   
+        $(".nav").find(".active").removeClass("active");
+        $("#tabProyecto").addClass("active");     
+    });
+    function traductor(id){
+        $.ajax({
+                url: '@Url.Action("SeleccionaProyecto", "Proyecto")',
+                type: 'GET',
+                data: {id:id},
+                dataType: 'json',
+                success: function(data){
+                    var idAux = id;
+                    
+                    var url = '@Url.Action("Index", "Traductor", new { idProyecto = "idAux"})';
+                    url = url.replace("idAux", id);
+                    console.log(url);
+                    //var url = '@Url.Action("Index", "Traductor")';
+                    window.location.href = url;
+                }
+            });
+    }
+    function memorias(id){
+        $.ajax({
+                url: '@Url.Action("SeleccionaProyecto", "Proyecto")',
+                type: 'GET',
+                data: {id:id},
+                success: function(){
+                    var url = '@Url.Action("Index", "Memoria")';
+                    window.location.href = url;
+                }
+            });
+    }
+    function glosario(id){
+        $.ajax({
+                url: '@Url.Action("SeleccionaProyecto", "Proyecto")',
+                type: 'GET',
+                data: {id:id},
+                success: function(){
+                    var url = '@Url.Action("Index", "Glosario")';
+                    window.location.href = url;
+                }
+            });
+    }
+    </script>
+   
+}

@@ -1,0 +1,35 @@
+@using System.Collections.Generic
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Authentication
+@model Moses.Models.Usuario
+@{
+    ViewData["Title"] = "Acceso";
+}
+
+<br>
+<div class="row">
+    <div class="col-md-8">
+        <section>
+            <form action="" method="post" enctype="multipart/form-data">
+                <label asp-for="CodUsuario" class="col-md-2 control-label">Usuario</label>
+                    <div class="col-md-10">
+                        <input asp-for="CodUsuario" class="form-control" />
+                        <span asp-validation-for="CodUsuario" class="text-danger"></span>
+                    </div>
+                <br>
+                <label asp-for="Contrasena" class="col-md-2 control-label">Contraseña</label>
+                    <div class="col-md-10">
+                        <input type="password" asp-for="Contrasena" class="form-control" />
+                        <span asp-validation-for="Contrasena" class="text-danger"></span>
+                    </div>
+                <br><br>
+                <input type="submit" value="Acceder" class="btn btn-primary"/>
+            </form>        
+            <span style="color:red">@ViewBag.error</span>    
+        </section>
+    </div> 
+</div>
+
+@section Scripts {
+   
+}

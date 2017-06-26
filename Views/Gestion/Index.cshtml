@@ -1,0 +1,117 @@
+@using System.Collections.Generic
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Authentication
+@model Moses.Models.ViewModels
+
+@{
+    ViewData["Title"] = "Gestión";
+    Layout = "~/Views/Shared/_LayoutAdministrador.cshtml";
+}
+
+<h2>@ViewData["Title"]</h2>
+<div class="row">
+    <table class="table table-bordered">
+                <tr>
+                    <th>#</th>
+                    <th>Título</th>
+                    <th>Fecha de modificación</th>
+                    <th>Actualizado</th>
+                    <th style="align-content: center;"></th>
+                </tr>
+                <tbody>
+                @foreach (var proyecto in @Model.Proyectos){   
+                            
+                    <tr id=@proyecto.Id>
+                        <td>@Html.DisplayFor(modelItem  => proyecto.Id)</td>
+                        <td>@Html.DisplayFor(modelItem  => proyecto.Descripcion)</td>
+                        <td>@Html.DisplayFor(modelItem  => proyecto.Fecha_modificacion)</td>
+                        <td>@Html.DisplayFor(modelItem  => proyecto.Actualizado)</td>     
+                        <td>
+                            @if (proyecto.Actualizado == false){                                
+                                <a id="btnActualizar2" class="open-modal btn btn-success" data-toggle="modal" data-target="#myModal" href="#myModal" data-id="@Html.DisplayFor(modelItem  => proyecto.Id)">Actualizar modelo</a>
+                            }                            
+                            <button type="button" class="btn btn-danger" onclick="eliminar('@Html.DisplayFor(modelItem  => proyecto.Id)')">Eliminar</button>
+                        </td>                   
+                    </tr>                
+                }
+                </tbody>
+            </table>
+    <div class="col-md-8">
+        <hr>
+        <h4>Crear nuevo proyecto</h4>
+        <section>            
+            <form action="" method="post" enctype="multipart/form-data">
+                <label for="file1">Título:</label>          
+                
+                <input type="text" class="form-control" rows="3"name="titulo"></textarea>
+                <br>
+                <input type="submit" value="Crear" class="btn btn-primary"/> 
+            </form>       
+        </section>
+    <div>
+        <hr>
+    <br><br>
+    <span class="glyphicon glyphicon-download-alt" title="Descargate fichero de log"></span> @Html.ActionLink("Descargar log", "DescargarLog", null, new { @style="text-indent: -9999px;"})
+    
+   
+    <!-- modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Actualizar modelo <span id="idProyectoModal"></span></h4>
+            </div>
+            <div class="modal-body">
+                <p>¿Generar un modelo de lenguaje nuevo o concatenarlo con el anterior?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" onclick="generarModelo(false)">Modelo nuevo</button>
+                <button type="button" class="btn btn-success" onclick="generarModelo(true)">Concatenar modelo</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+</div>    
+
+@section Scripts {
+    <script>
+    $(document).ready(function(){
+        $('#btnDescargaLog').attr({target: '_blank', href:'./logs/app.log'});        
+        $(".nav").find(".active").removeClass("active");
+        $("#tabGestion").addClass("active");         
+    });
+    function eliminar(id){
+        $.ajax({
+                url: '@Url.Action("BorrarProyecto", "Gestion")',
+                type: 'GET',
+                data: {id:id},
+                success: function(){                    
+                    window.location.href = window.location.href;
+                }
+            });
+    }    
+
+    function generarModelo(merge){
+        var id = $("#idProyectoModal").text();
+        console.log(id);
+        console.log(merge);
+        $.ajax({
+                url: '@Url.Action("EjecutarMoses", "Gestion")',
+                type: 'GET',
+                data: {id:id,merge:merge},
+                success: function(){                    
+                    window.location.href = window.location.href;
+                }
+            });
+    }  
+    $(document).on("click", ".open-modal", function(){
+        var myId = $(this).data('id');
+        console.log(myId);
+        $("#idProyectoModal").html(myId);
+    });
+    
+    
+    </script>
+}
