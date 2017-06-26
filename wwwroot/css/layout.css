@@ -1,0 +1,7 @@
+.navbar-inverse {
+    background-color: #08088A;
+    border-color: #080808;
+}
+.navbar-inverse .navbar-nav > .active > a{
+    background-color: #08044C
+}
